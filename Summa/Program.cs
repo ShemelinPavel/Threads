@@ -73,7 +73,7 @@ namespace Threads
             // количество потоков
             const ushort threadsNumber = 5;
 
-            Thread[] f_threads = new Thread[threadsNumber];
+            Thread[] s_threads = new Thread[threadsNumber];
             summaParts = new Container[threadsNumber];
 
             //вместимость одного хранилища исходя из количества потоков
@@ -104,10 +104,29 @@ namespace Threads
             {
                 Thread cur_thread = new Thread ( new ParameterizedThreadStart ( CalculateSummaPart ) );
                 cur_thread.Start ( i );
-                cur_thread.Join ();
+
+                s_threads[i] = cur_thread;
             }
 
-            //формирование общего результата из данных каждого хранилища обработанного потоком
+            //ждем пока потоки завершатся
+            bool exitFlag = false;
+
+            while (!(exitFlag))
+            {
+                foreach (Thread item in s_threads)
+                {
+                    if(item.IsAlive)
+                    {
+                        exitFlag = false;
+                        break;
+                    }
+                    else
+                    {
+                        exitFlag = true;
+                    }
+                }
+            }
+
             for (ushort i = 0; i < threadsNumber; i++)
             {
                 s_result += summaParts[i].Result;

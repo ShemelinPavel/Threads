@@ -105,10 +105,29 @@ namespace Threads
             {
                 Thread cur_thread = new Thread ( new ParameterizedThreadStart ( CalculateFactorialPart ) );
                 cur_thread.Start ( i );
-                cur_thread.Join ();
+
+                f_threads[i] = cur_thread;
             }
 
-            //формирование общего результата из данных каждого хранилища обработанного потоком
+            //ждем пока потоки завершатся
+            bool exitFlag = false;
+
+            while (!(exitFlag))
+            {
+                foreach (Thread item in f_threads)
+                {
+                    if (item.IsAlive)
+                    {
+                        exitFlag = false;
+                        break;
+                    }
+                    else
+                    {
+                        exitFlag = true;
+                    }
+                }
+            }
+
             for (ushort i = 0; i < threadsNumber; i++)
             {
                 f_result *= factorialParts[i].Result;
