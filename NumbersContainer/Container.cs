@@ -11,10 +11,13 @@ namespace NumbersContainer
     /// </summary>
     public class Container
     {
+        private ulong res;
+
+
         /// <summary>
         /// результат расчета части факториала
         /// </summary>
-        public ulong Result { get; set; }
+        public ulong Result => res;
 
         /// <summary>
         /// цифры для расчета факториала
@@ -33,7 +36,7 @@ namespace NumbersContainer
                 tmpresult += item;
             }
 
-            Result = tmpresult;
+            res = tmpresult;
         }
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace NumbersContainer
                 tmpresult *= item;
             }
 
-            Result = tmpresult;
+            res = tmpresult;
         }
 
         /// <summary>
@@ -64,13 +67,13 @@ namespace NumbersContainer
                 counter++;
             }
 
-            Result = 0;
+            res = 0;
         }
 
         public Container ()
         {
             NumbersList = new List<ulong> ();
-            Result = 0;
+            res = 0;
         }
     }
 }
