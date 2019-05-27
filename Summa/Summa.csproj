@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DCA916B6-9522-439D-B2DC-1798FC0CDE0A}</ProjectGuid>
+    <ProjectGuid>{EB7DB63F-0726-4FB5-8E27-019975336222}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Threads</RootNamespace>
-    <AssemblyName>Threads</AssemblyName>
+    <RootNamespace>Summa</RootNamespace>
+    <AssemblyName>Summa</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -11,26 +11,26 @@ namespace Threads
     class Program
     {
         /// <summary>
-        /// верх. граница факториала
+        /// верх. граница суммы чисел
         /// </summary>
-        private static ulong f_limit;
-        
+        private static ulong s_limit;
+
         /// <summary>
-        /// результат расчета факториала
+        /// результат расчета суммы чисел
         /// </summary>
-        private static ulong f_result = 1;
+        private static ulong s_result = 0;
 
         /// <summary>
         /// массив хранилищ с цифрами разбитые для потоков
         /// </summary>
-        private static Container[] factorialParts;
+        private static Container[] summaParts;
 
         static void Main ( string[] args )
         {
-            Console.Write ( "Введите положительное число для расчета факториала: " );
-            string f_limitAsString = Console.ReadLine ();
+            Console.Write ( "Введите положительное число для расчета суммы чисел: " );
+            string s_limitAsString = Console.ReadLine ();
 
-            bool result = ulong.TryParse ( f_limitAsString, out f_limit );
+            bool result = ulong.TryParse ( s_limitAsString, out s_limit );
 
             if (!(result))
             {
@@ -39,7 +39,7 @@ namespace Threads
                 Console.ReadKey ();
                 return;
             }
-            else if (f_limit <= 0)
+            else if(s_limit <= 0)
             {
                 Console.WriteLine ( "Число должно быть положительным и больше нуля!" );
                 Console.WriteLine ( "Для выхода нажмите любую клавишу." );
@@ -47,14 +47,14 @@ namespace Threads
                 return;
             }
 
-            #region вычисление факториала без потоков
+            #region вычисление cуммы без потоков
 
             //время начала расчета
             DateTime dateStart = DateTime.Now;
 
-            for (ulong i = 1; i <= f_limit; i++)
+            for (ulong i = 1; i <= s_limit; i++)
             {
-                f_result *= i;
+                s_result += i;
             }
 
             //время конца расчета
@@ -62,39 +62,38 @@ namespace Threads
 
             TimeSpan time = dateStop - dateStart;
 
-            Console.WriteLine ( $"Результат {f_result}. Время работы: {time}" );
+            Console.WriteLine ( $"Результат {s_result}. Время работы: {time}" );
 
-            #endregion вычисление факториала без потоков
+            #endregion вычисление суммы чисел без потоков
 
-            #region вычисление факториала c потоками
+            #region вычисление суммы чисел c потоками
 
-            f_result = 1;
+            s_result = 0;
 
             // количество потоков
             const ushort threadsNumber = 5;
 
             Thread[] f_threads = new Thread[threadsNumber];
-            factorialParts = new Container[threadsNumber];
+            summaParts = new Container[threadsNumber];
 
             //вместимость одного хранилища исходя из количества потоков
-            ulong capacityList = f_limit / threadsNumber;
+            ulong capacityList = s_limit / threadsNumber;
 
             //в последний поток добавляем все хвосты
-            ulong capacityLastList = capacityList + f_limit % threadsNumber;
+            ulong capacityLastList = capacityList + s_limit % threadsNumber;
 
             //счетчик для генерации цифр
             ulong counter = 1;
-
 
             //заполнение хранилищ для работы потоков
             for (ushort i = 0; i < threadsNumber; i++)
             {
                 bool lastList = i == threadsNumber - 1;
+                Container summaPart = new Container ();
 
-                Container curFactorialPart = new Container ();
-                curFactorialPart.Fill ( (lastList ? capacityLastList : capacityList), ref counter );
+                summaPart.Fill ( lastList ? capacityLastList : capacityList, ref counter );
 
-                factorialParts[i] = curFactorialPart;
+                summaParts[i] = summaPart;
             }
 
             //время начала расчета
@@ -103,7 +102,7 @@ namespace Threads
             //активация потоков
             for (ushort i = 0; i < threadsNumber; i++)
             {
-                Thread cur_thread = new Thread ( new ParameterizedThreadStart ( CalculateFactorialPart ) );
+                Thread cur_thread = new Thread ( new ParameterizedThreadStart ( CalculateSummaPart ) );
                 cur_thread.Start ( i );
                 cur_thread.Join ();
             }
@@ -111,7 +110,7 @@ namespace Threads
             //формирование общего результата из данных каждого хранилища обработанного потоком
             for (ushort i = 0; i < threadsNumber; i++)
             {
-                f_result *= factorialParts[i].Result;
+                s_result += summaParts[i].Result;
             }
 
             //время конца расчета
@@ -119,9 +118,9 @@ namespace Threads
 
             time = dateStop - dateStart;
 
-            Console.WriteLine ( $"Результат {f_result}. Время работы: {time}" );
+            Console.WriteLine ( $"Результат {s_result}. Время работы: {time}" );
 
-            #endregion вычисление факториала c потоками
+            #endregion вычисление суммы чисел c потоками
 
             Console.WriteLine ( "Для выхода нажмите любую клавишу." );
             Console.ReadKey ();
@@ -133,11 +132,11 @@ namespace Threads
         /// метод считающий часть факториала из цифр одного из хранилища
         /// </summary>
         /// <param name="threadNumber">индекс хранилища</param>
-        public static void CalculateFactorialPart ( object threadNumber )
+        public static void CalculateSummaPart ( object threadNumber )
         {
 
-            Container curFactorialPart = factorialParts[(ushort)threadNumber];
-            curFactorialPart.GetMulti ();
+            Container curSummaPart = summaParts[(ushort)threadNumber];
+            curSummaPart.GetSumm ();
         }
     }
 }
